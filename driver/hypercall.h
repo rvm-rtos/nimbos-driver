@@ -1,8 +1,6 @@
 #ifndef _NIMBOS_HYPERCALL_H
 #define _NIMBOS_HYPERCALL_H
 
-#define NIMBOS_SYSCALL_IPI_IRQ 13
-
 #define RVM_HC_RT_START    1
 #define RVM_HC_RT_SHUTDOWN 2
 
