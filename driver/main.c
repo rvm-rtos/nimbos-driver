@@ -7,6 +7,7 @@
 
 #include "hypercall.h"
 #include "nimbos.h"
+#include "syscall_handler.h"
 
 static struct mem_region rt_region;
 static struct resource *rt_mem_res;
@@ -15,6 +16,8 @@ static const struct file_operations nimbos_fops = {
     .owner = THIS_MODULE,
     .open = nimbos_open,
     .release = nimbos_close,
+    .unlocked_ioctl = nimbos_ioctl,
+    .compat_ioctl = nimbos_ioctl,
 };
 
 static struct miscdevice nimbos_device = {
@@ -32,7 +35,8 @@ static void init_hypercall(void)
 
 static irqreturn_t irq_handler(int irq, void *dev_id)
 {
-    printk(KERN_INFO "Interrupt %d\n", irq);
+    pr_debug("IRQ %d %p(%d)\n", irq, get_current(), get_current()->pid);
+    signal_all_handlers();
     return IRQ_HANDLED;
 }
 

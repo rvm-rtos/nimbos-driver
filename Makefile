@@ -1,14 +1,18 @@
 KDIR ?= /lib/modules/$(shell uname -r)/build
 RVM_DIR ?= $(PWD)/../jailhouse
+DEBUG :=
 
 KBUILD_EXTRA_SYMBOLS := $(RVM_DIR)/Module.symvers
+
+ifneq ($(DEBUG),)
+  KBUILD_CFLAGS += -DDEBUG
+endif
 
 module := nimbos_driver
 subdir-y := apps/
 obj-m := driver/
 
 build:
-	@echo $(KBUILD_EXTRA_SYMBOLS)
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 clean:
