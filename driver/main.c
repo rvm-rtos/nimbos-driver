@@ -134,8 +134,8 @@ static int __init nimbos_init(void)
         goto err_unregister;
     }
 
-    err = request_irq(NIMBOS_SYSCALL_IPI_IRQ, irq_handler, IRQF_SHARED,
-        "nimbos-driver", &nimbos_device);
+    err = request_irq(NIMBOS_SYSCALL_IPI_IRQ, irq_handler, IRQF_SHARED, "nimbos-driver",
+                      &nimbos_device);
     if (err) {
         pr_err("nimbos-driver: request_irq %d returns %d\n", NIMBOS_SYSCALL_IPI_IRQ, err);
         goto err_unregister;

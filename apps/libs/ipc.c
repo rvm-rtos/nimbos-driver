@@ -22,6 +22,11 @@ void nimbos_setup_ipc_buffer(int nimbos_fd)
     assert(syscall_data_buf_base != MAP_FAILED);
 }
 
+inline void *offset_to_ptr(uint64_t offset)
+{
+    return syscall_data_buf_base + offset;
+}
+
 inline struct ipc_buffer *get_send_buffer()
 {
     return (struct ipc_buffer *)syscall_send_buf_base;

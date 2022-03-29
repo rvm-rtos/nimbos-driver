@@ -1,15 +1,15 @@
 #ifndef _IPC_H
 #define _IPC_H
 
-#include <stddef.h>
 #include <assert.h>
+#include <stddef.h>
 #include <sys/mman.h>
 
 #include "spin_lock.h"
 
-#define NIMBOS_SYSCALL_SEND_BUF_SIZE    4096        // 4K
-#define NIMBOS_SYSCALL_RECV_BUF_SIZE    4096        // 4K
-#define NIMBOS_SYSCALL_DATA_BUF_SIZE    (4096 * 16) // 64K
+#define NIMBOS_SYSCALL_SEND_BUF_SIZE 4096      // 4K
+#define NIMBOS_SYSCALL_RECV_BUF_SIZE 4096      // 4K
+#define NIMBOS_SYSCALL_DATA_BUF_SIZE (1 << 20) // 1M
 
 enum ipc_opcode {
     IPC_OP_NOP = 0,
@@ -42,6 +42,8 @@ _Static_assert(offsetof(struct ipc_buffer, capacity_mask) == 16);
 _Static_assert(offsetof(struct ipc_buffer, entries) == 24);
 
 void nimbos_setup_ipc_buffer(int nimbos_fd);
+
+void *offset_to_ptr(uint64_t offset);
 
 struct ipc_buffer *get_send_buffer();
 

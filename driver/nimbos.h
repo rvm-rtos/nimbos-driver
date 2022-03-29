@@ -3,14 +3,14 @@
 
 #define NIMBOS_FIRMWARE "nimbos.bin"
 
-#define NIMBOS_SYSCALL_SIG_NUM      44
-#define NIMBOS_SYSCALL_IPI_IRQ      13
+#define NIMBOS_SYSCALL_SIG_NUM 44
+#define NIMBOS_SYSCALL_IPI_IRQ 13
 
-#define NIMBOS_SYSCALL_SEND_BUF_SIZE    4096        // 4K
-#define NIMBOS_SYSCALL_RECV_BUF_SIZE    4096        // 4K
-#define NIMBOS_SYSCALL_DATA_BUF_SIZE    (4096 * 16) // 64K
+#define NIMBOS_SYSCALL_SEND_BUF_SIZE 4096      // 4K
+#define NIMBOS_SYSCALL_RECV_BUF_SIZE 4096      // 4K
+#define NIMBOS_SYSCALL_DATA_BUF_SIZE (1 << 20) // 1M
 
-#define NIMBOS_SYSCALL_SETUP            _IO(0, 0)
+#define NIMBOS_SYSCALL_SETUP _IO(0, 0)
 
 struct mem_region {
     unsigned long long start;

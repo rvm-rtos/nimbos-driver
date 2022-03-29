@@ -17,7 +17,8 @@ int add_syscall_handler(syscall_handler_t handler)
 {
     struct handler_node *h;
 
-    list_for_each_entry(h, &handlers, entry) {
+    list_for_each_entry(h, &handlers, entry)
+    {
         if (h->handler == handler) {
             return -EEXIST;
         }
@@ -35,7 +36,8 @@ int del_syscall_handler(struct task_struct *handler)
 {
     struct handler_node *h;
 
-    list_for_each_entry(h, &handlers, entry) {
+    list_for_each_entry(h, &handlers, entry)
+    {
         if (h->handler == handler) {
             list_del(&h->entry);
             kfree(h);
@@ -58,7 +60,8 @@ void signal_all_handlers(void)
     info.si_code = SI_QUEUE;
     info.si_int = 2333;
 
-    list_for_each_entry(h, &handlers, entry) {
+    list_for_each_entry(h, &handlers, entry)
+    {
         task = h->handler;
         pr_debug("  send signal to %p(%d)\n", task, task->pid);
         err = send_sig_info(NIMBOS_SYSCALL_SIG_NUM, &info, task);
