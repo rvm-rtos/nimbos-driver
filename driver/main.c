@@ -5,11 +5,13 @@
 #include <linux/miscdevice.h>
 #include <linux/module.h>
 
+#include "file_ops.h"
 #include "hypercall.h"
 #include "nimbos.h"
 #include "syscall_handler.h"
 
-static struct mem_region rt_region;
+struct mem_region rt_region;
+
 static struct resource *rt_mem_res;
 
 static const struct file_operations nimbos_fops = {
@@ -18,6 +20,7 @@ static const struct file_operations nimbos_fops = {
     .release = nimbos_close,
     .unlocked_ioctl = nimbos_ioctl,
     .compat_ioctl = nimbos_ioctl,
+    .mmap = nimbos_mmap,
 };
 
 static struct miscdevice nimbos_device = {

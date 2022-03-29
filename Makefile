@@ -20,7 +20,7 @@ clean:
 
 insmod: rmmod
 	sudo insmod driver/$(module).ko
-	sudo chmod 644 /dev/nimbos
+	sudo chmod 666 /dev/nimbos
 
 rmmod:
 ifneq ($(shell lsmod | grep nimbos),)

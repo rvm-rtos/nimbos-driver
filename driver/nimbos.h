@@ -6,17 +6,19 @@
 #define NIMBOS_SYSCALL_SIG_NUM      44
 #define NIMBOS_SYSCALL_IPI_IRQ      13
 
-#define NIMBOS_REG_SYSCALL_HANDLER  _IO(0, 0)
+#define NIMBOS_SYSCALL_SEND_BUF_SIZE    4096        // 4K
+#define NIMBOS_SYSCALL_RECV_BUF_SIZE    4096        // 4K
+#define NIMBOS_SYSCALL_DATA_BUF_SIZE    (4096 * 16) // 64K
+
+#define NIMBOS_SYSCALL_SETUP            _IO(0, 0)
 
 struct mem_region {
     unsigned long long start;
     unsigned long long size;
 };
 
-extern int get_rt_memory_region(struct mem_region *region);
+extern struct mem_region rt_region;
 
-int nimbos_open(struct inode *inode, struct file *file);
-int nimbos_close(struct inode *inode, struct file *file);
-long nimbos_ioctl(struct file *file, unsigned int ioctl, unsigned long arg);
+extern int get_rt_memory_region(struct mem_region *region);
 
 #endif /* !_NIMBOS_H */
