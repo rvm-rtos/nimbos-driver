@@ -26,3 +26,6 @@ rmmod:
 ifneq ($(shell lsmod | grep nimbos),)
 	sudo rmmod $(module)
 endif
+
+run: insmod
+	./apps/hello

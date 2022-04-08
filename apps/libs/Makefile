@@ -1,4 +1,4 @@
-obj-y := syscall.o ipc.o
+obj-y := syscall.o scf.o
 
 always := ulib.a
 

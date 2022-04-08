@@ -1,4 +1,4 @@
-LD = $(CC) $(KBUILD_CFLAGS)
+LD = $(CC) $(KBUILD_CFLAGS) -pthread -lpthread
 
 NOSTDINC_FLAGS :=
 LINUXINCLUDE := -I$(src)/include

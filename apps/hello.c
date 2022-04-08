@@ -12,7 +12,6 @@ int main()
         printf("Failed to open NimbOS device `%s`\n", NIMBOS_DEV);
         return fd;
     }
-    printf("%d\n", fd);
 
     for (;;) {
         // printf("Sleep %d...\n", i);

@@ -60,15 +60,11 @@ int nimbos_mmap(struct file *file, struct vm_area_struct *vma)
     switch (vma->vm_pgoff) {
     case 0: // data buffer
         size = NIMBOS_SYSCALL_DATA_BUF_SIZE;
+        paddr -= NIMBOS_SYSCALL_QUEUE_BUF_SIZE + size;
+        break;
+    case 1: // queue buffer
+        size = NIMBOS_SYSCALL_QUEUE_BUF_SIZE;
         paddr -= size;
-        break;
-    case 1: // send buffer
-        size = NIMBOS_SYSCALL_SEND_BUF_SIZE;
-        paddr -= NIMBOS_SYSCALL_DATA_BUF_SIZE + NIMBOS_SYSCALL_RECV_BUF_SIZE + size;
-        break;
-    case 2: // recv buffer
-        size = NIMBOS_SYSCALL_RECV_BUF_SIZE;
-        paddr -= NIMBOS_SYSCALL_DATA_BUF_SIZE + size;
         break;
     default:
         return -EINVAL;
