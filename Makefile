@@ -9,14 +9,18 @@ ifneq ($(DEBUG),)
 endif
 
 module := nimbos_driver
-subdir-y := apps/
+subdir-y := apps
 obj-m := driver/
 
+user:
+	make -C userapps build
+	ln -sf userapps/build/x86_64/bin linux
+
 build:
-	$(MAKE) -C $(KDIR) M=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$$PWD modules
 
 clean:
-	$(MAKE) -C $(KDIR) M=$(PWD) clean
+	$(MAKE) -C $(KDIR) M=$$PWD clean
 
 insmod: rmmod
 	sudo insmod driver/$(module).ko

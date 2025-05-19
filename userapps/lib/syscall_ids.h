@@ -1,0 +1,11 @@
+#define SYS_read          0
+#define SYS_write         1
+#define SYS_yield         24
+#define SYS_nanosleep     35
+#define SYS_getpid        39
+#define SYS_clone         56
+#define SYS_fork          57
+#define SYS_exec          59
+#define SYS_exit          60
+#define SYS_waitpid       61
+#define SYS_clock_gettime 228

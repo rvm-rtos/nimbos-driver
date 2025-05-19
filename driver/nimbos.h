@@ -10,6 +10,10 @@
 #define NIMBOS_SYSCALL_QUEUE_BUF_SIZE 4096      // 4K
 
 #define NIMBOS_SYSCALL_SETUP _IO(0, 0)
+#define NIMBOS_EXIT _IO(0, 1)
+#define NIMBOS_NOTIFY _IO(1, 2)
+
+#define NIMBOS_NOTIFY_VECTOR 40
 
 struct mem_region {
     unsigned long long start;

@@ -1,36 +1,50 @@
 #include <stdio.h>
 #include <sys/errno.h>
+#include <sys/ioctl.h>
 
 #include "scf.h"
+#include "remap.h"
+#include "nimbos.h"
 
 #define ALIGN_UP(addr, align) ((addr + align - 1) & ~(align - 1))
 
-static void *syscall_data_buf_base;
 static void *syscall_queue_buf_base;
 
 struct syscall_queue_buffer g_syscall_queue_buffer;
+int g_nimbos_fd;
+int g_slot_num;
 
-int nimbos_setup_syscall_buffers(int nimbos_fd)
+inline int *get_slot_num() {
+    return &g_slot_num;
+}
+
+inline void set_slot_num(int slot_num) {
+    g_slot_num = slot_num;
+}
+
+int nimbos_setup_syscall_buffers(int nimbos_fd, int slot_num)
 {
-    syscall_data_buf_base = mmap(0, NIMBOS_SYSCALL_DATA_BUF_SIZE, PROT_READ | PROT_WRITE,
-                                 MAP_SHARED | MAP_POPULATE, nimbos_fd, 0);
-    if (syscall_data_buf_base == MAP_FAILED) {
-        return -ENOMEM;
-    }
+    uint64_t syscall_queue_buf_paddr = NIMBOS_SYSCALL_QUEUE_BUF_SLOT_PADDR(slot_num);
+    syscall_queue_buf_base = (void *)SHADOW_KERNEL_PADDR_TO_VADDR((void *)syscall_queue_buf_paddr);
 
-    syscall_queue_buf_base = mmap(0, NIMBOS_SYSCALL_QUEUE_BUF_SIZE, PROT_READ | PROT_WRITE,
-                                  MAP_SHARED | MAP_POPULATE, nimbos_fd, 0x1000);
-    if (syscall_queue_buf_base == MAP_FAILED) {
+    // printf("Shadow: map [%x, %x)\n", SHADOW_KERNEL_PADDR_TO_VADDR(NIMBOS_KERNEL_BASE_PADDR), SHADOW_KERNEL_PADDR_TO_VADDR(NIMBOS_KERNEL_BASE_PADDR) + NIMBOS_KERNEL_MAXSIZE);
+    void *nimbos_kernel_base = mmap(
+        (void *)SHADOW_KERNEL_PADDR_TO_VADDR(NIMBOS_KERNEL_BASE_PADDR), NIMBOS_KERNEL_MAXSIZE,
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_POPULATE | MAP_FIXED, 
+        nimbos_fd, 
+        NIMBOS_KERNEL_BASE_PADDR - NIMBOS_BASE_PADDR
+    );
+    if (nimbos_kernel_base == MAP_FAILED) {
         return -ENOMEM;
     }
-    // printf("%p %p\n", syscall_data_buf_base, syscall_queue_buf_base);
 
     struct syscall_queue_buffer_metadata *meta = syscall_queue_buf_base;
     struct scf_descriptor *desc;
     uint16_t *req_ring, *rsp_ring;
     uint16_t capacity = meta->capacity;
 
-    // printf("%x %d %d %d %d %d\n", meta->magic, meta->capacity, meta->lock,
+    // printf("magic:%x cap:%d lock:%d req:%d rsp:%d\n", meta->magic, meta->capacity, meta->lock,
     // meta->req_index, meta->rsp_index);
 
     if (meta->magic != SYSCALL_QUEUE_BUFFER_MAGIC) {
@@ -44,6 +58,8 @@ int nimbos_setup_syscall_buffers(int nimbos_fd)
     req_ring = (void *)desc + capacity * sizeof(struct scf_descriptor);
     rsp_ring = (void *)req_ring + capacity * sizeof(uint16_t);
 
+    // printf("desc:%p req:%p rsp:%p\n", desc, req_ring, rsp_ring);
+
     g_syscall_queue_buffer = (struct syscall_queue_buffer){
         .capacity_mask = capacity - 1,
         .req_index_last = 0,
@@ -54,17 +70,18 @@ int nimbos_setup_syscall_buffers(int nimbos_fd)
         .rsp_ring = rsp_ring,
     };
 
-    return 0;
-}
+    g_nimbos_fd = nimbos_fd;
 
-inline void *offset_to_ptr(uint64_t offset)
-{
-    return syscall_data_buf_base + offset;
+    return 0;
 }
 
 inline struct syscall_queue_buffer *get_syscall_queue_buffer()
 {
     return &g_syscall_queue_buffer;
+}
+
+inline int *get_nimbos_fd() {
+    return &g_nimbos_fd;
 }
 
 static inline int has_request(struct syscall_queue_buffer *buf)
@@ -128,5 +145,6 @@ int push_syscall_response(struct syscall_queue_buffer *buf, uint16_t index,
 
 end:
     spin_unlock(&buf->meta->lock);
+    ioctl(*get_nimbos_fd(), NIMBOS_NOTIFY);
     return err;
 }
